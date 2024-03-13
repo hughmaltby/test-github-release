@@ -11,7 +11,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch
+      - name: Checkout Branch
         uses: actions/checkout@v4
       - name: Determine Tag
         id: determine-tag
@@ -22,9 +22,9 @@ jobs:
           DRY_RUN: true
       - name: Tags
         run: |
-          echo -e "The next tag version will be: ${{ steps.determine-tag.outputs.new_tag }}" \
-          \n The current tag is: ${{ steps.determine-tag.outputs.tag }}" \
-          \n The version increment was: ${{ steps.determine-tag.outputs.part }}"
+          echo -e "The newly created tag version will be: ${{ steps.determine-tag.outputs.new_tag }} \n
+            The latest tag after running this action is: ${{ steps.determine-tag.outputs.tag }} \n
+            The version increment was: ${{ steps.determine-tag.outputs.part }}"
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
