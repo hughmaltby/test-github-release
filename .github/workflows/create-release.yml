@@ -1,0 +1,33 @@
+name: Create Release
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+concurrency: production
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      - name: Determine Tag
+        id: determine-tag
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DRY_RUN: true
+      - name: Tags
+        run: |
+          echo "The next tag version will be: ${{ steps.determine-tag.outputs.new_tag }}" \
+          echo "The current tag is: ${{ steps.determine-tag.outputs.tag }}" \
+          echo "The version increment was: ${{ steps.determine-tag.outputs.part }}"
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.determine-tag.outputs.new_tag }}
+          generateReleaseNotes: true
+          makeLatest: true
