@@ -1,39 +1,36 @@
-name: Auto Tag my Application
+name: Auto Tag
 on:
   push:
     branches:
-      - main
+      - master
+concurrency: production
 jobs:
-  Patch:
+  build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-    - name: Minor version for each merge
-      id: taggerDryRun
-      uses: anothrNick/github-tag-action@1.67.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
-        DRY_RUN: true
-
-    - name: echo new tag
-      run: |
-        echo "The next tag version will be: ${{ steps.taggerDryRun.outputs.new_tag }}"
-    - name: echo tag
-      run: |
-        echo "The current tag is: ${{ steps.taggerDryRun.outputs.tag }}"
-    - name: echo part
-      run: |
-        echo "The version increment was: ${{ steps.taggerDryRun.outputs.part }}"
-    # DO MY BUILD HERE
-    # IN CASE OF FAILURE, THE STEP BELOW WILL NOT RUN.
-    
-
-    - name: Minor version for each merge
-      id: taggerFinal
-      uses: anothrNick/github-tag-action@1.67.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: '0'
+      - name: Tag Dry Run
+        id: taggerDryRun
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DRY_RUN: true
+      - name: Tags
+        run: |
+          echo "The next tag version will be: ${{ steps.taggerDryRun.outputs.new_tag }}" \
+          echo "The current tag is: ${{ steps.taggerDryRun.outputs.tag }}" \
+          echo "The version increment was: ${{ steps.taggerDryRun.outputs.part }}"      
+      - name: Tag Pre-release
+        id: taggerFinal
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          PRERELEASE: true
