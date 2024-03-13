@@ -22,9 +22,9 @@ jobs:
           DRY_RUN: true
       - name: Tags
         run: |
-          echo "The next tag version will be: ${{ steps.determine-tag.outputs.new_tag }}" \
-          echo "The current tag is: ${{ steps.determine-tag.outputs.tag }}" \
-          echo "The version increment was: ${{ steps.determine-tag.outputs.part }}"
+          echo -e "The next tag version will be: ${{ steps.determine-tag.outputs.new_tag }}" \
+          \n The current tag is: ${{ steps.determine-tag.outputs.tag }}" \
+          \n The version increment was: ${{ steps.determine-tag.outputs.part }}"
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
